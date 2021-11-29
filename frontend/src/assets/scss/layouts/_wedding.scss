@@ -1,0 +1,22 @@
+.container-wedding {
+    padding: 64px;
+    width: 100%;
+    .content-wedding {
+      text-align: center;
+      margin-bottom: 64px;
+      .content-name {
+        font-family: $font-family-arvo;
+        font-size: 64px;
+        color: $primary;
+      }
+      .content-parents {
+        font-size: 20px;
+        color: $secondary;
+      }
+      .content-and {
+        font-family: $font-family-arvo;
+        font-size: 48px;
+        color: $primary;
+      }
+    }
+  }

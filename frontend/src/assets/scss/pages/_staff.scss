@@ -1,0 +1,32 @@
+.staff-container {
+    height: 100%;
+    display: block;
+    width: 100%;
+    height: fit-content;
+    margin-top: 72px;
+    padding-right: 20px;
+    padding-left: 20px;
+    background-color: white;
+}
+
+.card-header-container {
+    flex-direction: row;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    .card-header-add-button {
+        display: flex;
+        align-items: flex-end;
+        justify-content: flex-end;
+    }
+    .card-header-title-text {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .card-body-container {
+        width: 100%;
+        overflow: auto;
+    }
+}

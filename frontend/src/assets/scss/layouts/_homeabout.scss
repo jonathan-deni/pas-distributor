@@ -1,0 +1,18 @@
+.homeabout-container {
+    display: block;
+    width: 100%;
+    height: fit-content;
+    background-color: $light;
+    .homebannertext-container {
+      align-items: flex-end;
+      .homebannertext-title {
+        text-align: right;
+      }
+      .homebannertext-desc {
+        text-align: right;
+      }
+    }
+    .aboutimage-container {
+      padding-bottom: 1rem;
+    }
+}

@@ -1,0 +1,12 @@
+.container-guestform {
+    width: 100%;
+    padding: 32px 64px;
+    min-height: 400px;
+    .form-title {
+        max-width: 600px;
+        margin: auto;
+        font-size: 50px;
+        text-align: center;
+        font-family: $font-family-parisienne;
+    }
+}

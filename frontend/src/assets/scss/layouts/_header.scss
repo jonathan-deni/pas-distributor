@@ -1,0 +1,14 @@
+.container-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1040;
+    width: 100%;
+    height: 72px;
+    padding: 8px 16px;
+    background-color: $light;
+}
+.nested-dropdown {
+  color: black;
+  align-items: center;
+}
