@@ -22,8 +22,12 @@ import {
   Table,
 } from "reactstrap";
 import { useTable } from "react-table";
-import { mockStaffTableData, staffColumns } from "../../data/StaffListData";
-import { FormProvider, useForm } from "react-hook-form";
+import {
+  mockStaffTableData,
+  staffColumns,
+  staffDropdownList,
+} from "../../data/StaffListData";
+import { useForm } from "react-hook-form";
 
 const CardHeaderWithButton = ({ onClickHeaderButton }) => (
   <div className="card-header-container">
@@ -62,14 +66,7 @@ const renderActionButtonCell = (cell) => (
   </td>
 );
 
-const useStaffForm = () => {
-  const formMethods = useForm({
-    mode: "onBlur",
-    reValidateMode: "onChange",
-  });
-
-  return formMethods;
-};
+const useStaffForm = () => useForm();
 
 const StaffListTable = ({ columns, data }) => {
   const {
@@ -90,12 +87,13 @@ const StaffListTable = ({ columns, data }) => {
           {headerGroups.map((headerGroup) => (
             <tr {...headerGroup.getHeaderGroupProps()}>
               {headerGroup.headers.map((column, i) => {
-                if (i !== 0)
-                  return (
-                    <th {...column.getHeaderProps()}>
-                      {column.render("Header")}
-                    </th>
-                  );
+                // if (i !== 0) {
+                return (
+                  <th {...column.getHeaderProps()}>
+                    {column.render("Header")}
+                  </th>
+                );
+                // }
               })}
             </tr>
           ))}
@@ -120,159 +118,233 @@ const StaffListTable = ({ columns, data }) => {
   );
 };
 
-const NewStaffForm = () => (
-  <div>
-    <Row>
-      <Col>
-        <FormGroup floating={true}>
-          <Label>Kode</Label>
-          <Input id="kode" name="kode" placeholder="Kode" type="text" />
-          <FormFeedback>Kode harus diisi</FormFeedback>
-        </FormGroup>
-      </Col>
-      <Col>
-        <FormGroup floating={true}>
-          <Label>Nama</Label>
-          <Input id="nama" name="nama" placeholder="Nama" type="text" />
-        </FormGroup>
-      </Col>
-    </Row>
-    <Row>
-      <Col>
-        <FormGroup floating={true}>
-          <Label>Alamat</Label>
+const registerFormInput = (register, name, obj) => register(name, obj);
+
+const _renderDropdownOptions = (options) =>
+  options.map((opt, index) => index === 0 ? (
+      <option value="" disabled selected>
+        {opt.option}
+      </option>
+    ) : (
+      <option value={opt.value}>{opt.option}</option>
+    )
+);
+
+const InputFormWithType = ({
+  register,
+  label,
+  placeholder,
+  type,
+  prefixText,
+  options,
+}) => {
+  const { ref, ...rest } = register;
+  return (
+    <FormGroup>
+      <Label>{label}</Label>
+      <InputGroup>
+        {prefixText && <InputGroupText>{prefixText}</InputGroupText>}
+        {options ? (
+          <Input {...rest} placeholder={placeholder} type={type} innerRef={ref}>
+            {_renderDropdownOptions(options)}
+          </Input>
+        ) : (
           <Input
-            id="alamat"
-            name="alamat"
+            {...rest}
+            placeholder={placeholder}
+            type={type}
+            innerRef={ref}
+          />
+        )}
+      </InputGroup>
+      <FormFeedback/>
+    </FormGroup>
+  );
+};
+
+const NewStaffForm = ({ formMethods: { register } }) => {
+  const kodeRegister = registerFormInput(register, "kode", {
+    isRequired: true,
+  });
+  const nameRegister = registerFormInput(register, "nama", {
+    isRequired: true,
+  });
+  const alamatRegister = registerFormInput(register, "alamat", {
+    isRequired: true,
+  });
+  const kotaRegister = registerFormInput(register, "kota", {
+    isRequired: true,
+  });
+  const hpRegister = registerFormInput(register, "hp", {
+    isRequired: true,
+  });
+  const tanggalLahirRegister = registerFormInput(register, "tanggal_lahir", {
+    isRequired: true,
+  });
+  const mulaiKerjaRegister = registerFormInput(register, "mulai_kerja", {
+    isRequired: true,
+  });
+  const gajiPokokRegister = registerFormInput(register, "gaji_pokok", {
+    isRequired: true,
+  });
+  const insentifRegister = registerFormInput(register, "insentif", {
+    isRequired: true,
+  });
+  const tunjanganRegister = registerFormInput(register, "tunjangan", {
+    isRequired: true,
+  });
+  const jamsostekRegister = registerFormInput(register, "jamsostek", {
+    isRequired: true,
+  });
+  const agamaRegister = registerFormInput(register, "agama", {
+    isRequired: true,
+  });
+  const tipeRegister = registerFormInput(register, "tipe", {
+    isRequired: true,
+  });
+  const statusRegister = registerFormInput(register, "status", {
+    isRequired: true,
+  });
+
+  return (
+    <div>
+      <Row>
+        <Col>
+          <InputFormWithType
+            register={kodeRegister}
+            label="Kode"
+            placeholder="Kode"
+            type="text"
+          />
+        </Col>
+        <Col>
+          <InputFormWithType
+            register={nameRegister}
+            label="Nama"
+            placeholder="Nama"
+            type="text"
+          />
+        </Col>
+      </Row>
+      <Row>
+        <Col>
+          <InputFormWithType
+            register={alamatRegister}
+            label="Alamat"
             placeholder="Alamat"
             type="textarea"
           />
-        </FormGroup>
-      </Col>
-    </Row>
-    <Row>
-      <Col>
-        <FormGroup floating={true}>
-          <Label>Kota</Label>
-          <Input id="kota" name="kota" placeholder="Kota" type="text" />
-        </FormGroup>
-      </Col>
-      <Col>
-        <FormGroup floating={true}>
-          <Label>No Handphone</Label>
-          <Input id="hp" name="hp" placeholder="No Handphone" type="text" />
-        </FormGroup>
-      </Col>
-    </Row>
-    <Row>
-      <Col>
-        <FormGroup floating={true}>
-          <Label>Tanggal Lahir</Label>
-          <Input
-            id="tanggal_lahir"
-            name="tanggal_lahir"
+        </Col>
+      </Row>
+      <Row>
+        <Col>
+          <InputFormWithType
+            register={kotaRegister}
+            label="Kota"
+            placeholder="Kota"
+            type="text"
+          />
+        </Col>
+        <Col>
+          <InputFormWithType
+            register={hpRegister}
+            label="No Handphone"
+            placeholder="No Handphone"
+            type="text"
+          />
+        </Col>
+      </Row>
+      <Row>
+        <Col>
+          <InputFormWithType
+            register={tanggalLahirRegister}
+            label="Tanggal Lahir"
             placeholder="Tanggal Lahir"
             type="date"
           />
-        </FormGroup>
-      </Col>
-      <Col>
-        <FormGroup floating={true}>
-          <Label>Agama</Label>
-          <Input id="agama" name="agama" type="select">
-            <option value="" disabled selected>
-              Pilih Agama...
-            </option>
-            <option value="islam">Islam</option>
-            <option value="kristen">Kristen Protestan</option>
-            <option value="katolik">Kristen Katolik</option>
-            <option value="hindu">Hindu</option>
-            <option value="budha">Budha</option>
-          </Input>
-        </FormGroup>
-      </Col>
-    </Row>
-    <Row>
-      <Col>
-        <FormGroup floating={true}>
-          <Label>Mulai Kerja</Label>
-          <Input
-            id="mulai_kerja"
-            name="mulai_kerja"
+        </Col>
+        <Col>
+          <InputFormWithType
+            register={agamaRegister}
+            label="Agama"
+            placeholder="Agama"
+            type="select"
+            options={staffDropdownList.agama}
+          />
+        </Col>
+      </Row>
+      <Row>
+        <Col>
+          <InputFormWithType
+            register={mulaiKerjaRegister}
+            label="Mulai Kerja"
             placeholder="Mulai Kerja"
             type="date"
           />
-        </FormGroup>
-      </Col>
-      <Col>
-        <FormGroup floating={true}>
-          <Label>Tipe</Label>
-          <Input id="tipe" name="tipe" type="select">
-            <option value="" disabled selected>
-              Pilih Tipe...
-            </option>
-            <option value="islam">Owner</option>
-            <option value="kristen">Staff</option>
-          </Input>
-        </FormGroup>
-      </Col>
-      <Col>
-        <FormGroup floating={true}>
-          <Label>Status</Label>
-          <Input id="status" name="status" type="select">
-            <option value="" disabled selected>
-              Pilih Status...
-            </option>
-            <option value="islam">Aktif</option>
-            <option value="kristen">Non-aktif</option>
-          </Input>
-        </FormGroup>
-      </Col>
-    </Row>
-    <Row>
-      <Col>
-        <FormGroup floating={true}>
-          <Label>Gaji Pokok</Label>
-          <InputGroup>
-            <InputGroupText>Rp</InputGroupText>
-            <Input name="gaji_pokok" placeholder="Gaji Pokok" type="text" />
-          </InputGroup>
-        </FormGroup>
-      </Col>
-      <Col>
-        <FormGroup floating={true} >
-          <Label>Insentif</Label>
-          <InputGroup>
-            <InputGroupText>Rp</InputGroupText>
-            <Input name="insentif" placeholder="Insentif" type="text" />
-          </InputGroup>
-        </FormGroup>
-      </Col>
-    </Row>
-    <Row>
-      <Col>
-        <Label>Tunjangan</Label>
-        <InputGroup>
-          <InputGroupText>Rp</InputGroupText>
-          <Input name="tunjangan" placeholder="Tunjangan" type="text" />
-        </InputGroup>
-      </Col>
-      <Col>
-        <Label>Jamsostek</Label>
-        <InputGroup>
-          <InputGroupText>Rp</InputGroupText>
-          <Input name="jamsostek" placeholder="Jamsostek" type="text" />
-        </InputGroup>
-      </Col>
-    </Row>
-  </div>
-);
+        </Col>
+        <Col>
+          <InputFormWithType
+            register={tipeRegister}
+            label="Tipe"
+            type="select"
+            options={staffDropdownList.tipe}
+          />
+        </Col>
+        <Col>
+          <InputFormWithType
+            register={statusRegister}
+            label="Status"
+            type="select"
+            options={staffDropdownList.status}
+          />
+        </Col>
+      </Row>
+      <Row>
+        <Col>
+          <InputFormWithType
+            register={gajiPokokRegister}
+            label="Gaji Pokok"
+            placeholder="Gaji Pokok"
+            type="number"
+            prefixText="Rp"
+          />
+        </Col>
+        <Col>
+          <InputFormWithType
+            register={insentifRegister}
+            label="Insentif"
+            placeholder="Insentif"
+            type="number"
+            prefixText="Rp"
+          />
+        </Col>
+      </Row>
+      <Row>
+        <Col>
+          <InputFormWithType
+            register={tunjanganRegister}
+            label="Tunjangan"
+            placeholder="Tunjangan"
+            type="number"
+            prefixText="Rp"
+          />
+        </Col>
+        <Col>
+          <InputFormWithType
+            register={jamsostekRegister}
+            label="Jamsostek"
+            placeholder="Jamsostek"
+            type="number"
+            prefixText="Rp"
+          />
+        </Col>
+      </Row>
+    </div>
+  );
+};
 
 const AddNewStaffModal = ({ isShowAddModal, setIsShowAddModal }) => {
-  const formMethods = useForm({
-    mode: "onBlur",
-    reValidateMode: "onChange",
-  });
+  const formMethods = useForm();
   return (
     <Modal
       isOpen={isShowAddModal}
@@ -281,19 +353,25 @@ const AddNewStaffModal = ({ isShowAddModal, setIsShowAddModal }) => {
       backdrop={true}
       fullscreen={true}
     >
-      <FormProvider {...formMethods}>
-        <Form onSubmit={formMethods.handleSubmit((data) => console.log(data))}>
+      <div className="add-staff-modal-container">
+        <Form>
           <ModalHeader toggle={() => setIsShowAddModal(false)}>
             Add New Staff
           </ModalHeader>
           <ModalBody>
-            <NewStaffForm />
+            <NewStaffForm formMethods={formMethods} />
           </ModalBody>
           <ModalFooter>
-            <Input type="submit"></Input>
+            <Button
+              onClick={() =>
+                formMethods.handleSubmit((data) => console.log(data))()
+              }
+            >
+              Save
+            </Button>
           </ModalFooter>
         </Form>
-      </FormProvider>
+      </div>
     </Modal>
   );
 };
