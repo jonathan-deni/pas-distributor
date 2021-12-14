@@ -14,7 +14,7 @@ export const mockStaffTableData = [
     jamsostek: "500000",
     status: "active",
     sales_coor: "Henry",
-    sales_supervisor: "Anthony",
+    sales_supervisor: "Anthony"
   },
   {
     kode: "A0002",
@@ -31,7 +31,7 @@ export const mockStaffTableData = [
     jamsostek: "500000",
     status: "active",
     sales_coor: "Itoy",
-    sales_supervisor: "Anthony",
+    sales_supervisor: "Anthony"
   },
 ];
 

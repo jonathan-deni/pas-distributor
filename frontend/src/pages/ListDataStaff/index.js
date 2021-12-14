@@ -66,8 +66,6 @@ const renderActionButtonCell = (cell) => (
   </td>
 );
 
-const useStaffForm = () => useForm();
-
 const StaffListTable = ({ columns, data }) => {
   const {
     getTableProps, // table props from react-table
@@ -343,7 +341,7 @@ const NewStaffForm = ({ formMethods: { register } }) => {
   );
 };
 
-const AddNewStaffModal = ({ isShowAddModal, setIsShowAddModal }) => {
+const AddNewStaffModal = ({ isShowAddModal, setIsShowAddModal, onSubmitNewStaff }) => {
   const formMethods = useForm();
   return (
     <Modal
@@ -364,7 +362,7 @@ const AddNewStaffModal = ({ isShowAddModal, setIsShowAddModal }) => {
           <ModalFooter>
             <Button
               onClick={() =>
-                formMethods.handleSubmit((data) => console.log(data))()
+                formMethods.handleSubmit(data => onSubmitNewStaff(data))()
               }
             >
               Save
@@ -376,10 +374,29 @@ const AddNewStaffModal = ({ isShowAddModal, setIsShowAddModal }) => {
   );
 };
 
+const onSubmitNewStaff = (
+  staffListTableData,
+  setStaffListTableData,
+  setIsShowAddModal
+) => (data) => {
+  const newStaffData = {
+    ...data,
+    sales_coor: "Itoy",
+    sales_supervisor: "Anthony"
+  }
+  const newStaffListTableData = [
+    ...staffListTableData,
+    newStaffData
+  ]
+  setStaffListTableData(newStaffListTableData)
+  setIsShowAddModal(false)
+}
+
 const ListDataStaff = () => {
   const columns = React.useMemo(() => staffColumns, []);
   const [isShowAddModal, setIsShowAddModal] = React.useState(false);
-  const formMethods = useStaffForm();
+  const [staffListTableData, setStaffListTableData] = React.useState(mockStaffTableData);
+
   return (
     <div className="staff-container">
       <Card>
@@ -389,13 +406,13 @@ const ListDataStaff = () => {
           />
         </CardHeader>
         <CardBody>
-          <StaffListTable columns={columns} data={mockStaffTableData} />
+          <StaffListTable columns={columns} data={staffListTableData} />
         </CardBody>
       </Card>
       <AddNewStaffModal
         isShowAddModal={isShowAddModal}
         setIsShowAddModal={setIsShowAddModal}
-        formMethods={formMethods}
+        onSubmitNewStaff={onSubmitNewStaff(staffListTableData, setStaffListTableData, setIsShowAddModal)}
       />
     </div>
   );
