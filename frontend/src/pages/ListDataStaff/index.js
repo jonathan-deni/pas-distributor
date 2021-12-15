@@ -28,6 +28,7 @@ import {
   staffDropdownList,
 } from "../../data/StaffListData";
 import { useForm } from "react-hook-form";
+const axios = require('axios');
 
 const CardHeaderWithButton = ({ onClickHeaderButton }) => (
   <div className="card-header-container">
@@ -392,10 +393,24 @@ const onSubmitNewStaff = (
   setIsShowAddModal(false)
 }
 
+const getStaffListFromServer = async (setStaffListTableData) => {
+  try {
+    const staffListData = await axios.get('http://localhost:5000/staff')
+    console.log("<<<STAFF LIST ", staffListData)
+    setStaffListTableData(staffListData)
+  } catch(err) {
+    console.log('error fetch staff data ', err)
+  }
+}
+
 const ListDataStaff = () => {
   const columns = React.useMemo(() => staffColumns, []);
   const [isShowAddModal, setIsShowAddModal] = React.useState(false);
-  const [staffListTableData, setStaffListTableData] = React.useState(mockStaffTableData);
+  const [staffListTableData, setStaffListTableData] = React.useState([]);
+
+  React.useEffect(() => {
+    getStaffListFromServer(setStaffListTableData)
+  }, [])
 
   return (
     <div className="staff-container">
