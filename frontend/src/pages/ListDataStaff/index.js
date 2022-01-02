@@ -177,13 +177,13 @@ const NewStaffForm = ({ formMethods: { register } }) => {
   const hpRegister = registerFormInput(register, "hp", {
     isRequired: true,
   });
-  const tanggalLahirRegister = registerFormInput(register, "tanggal_lahir", {
+  const tanggalLahirRegister = registerFormInput(register, "tanggallahir", {
     isRequired: true,
   });
-  const mulaiKerjaRegister = registerFormInput(register, "mulai_kerja", {
+  const mulaiKerjaRegister = registerFormInput(register, "mulaikerja", {
     isRequired: true,
   });
-  const gajiPokokRegister = registerFormInput(register, "gaji_pokok", {
+  const gajiPokokRegister = registerFormInput(register, "gajipokok", {
     isRequired: true,
   });
   const insentifRegister = registerFormInput(register, "insentif", {
@@ -198,7 +198,7 @@ const NewStaffForm = ({ formMethods: { register } }) => {
   const agamaRegister = registerFormInput(register, "agama", {
     isRequired: true,
   });
-  const tipeRegister = registerFormInput(register, "tipe", {
+  const tipeRegister = registerFormInput(register, "stafftypeid", {
     isRequired: true,
   });
   const statusRegister = registerFormInput(register, "status", {
@@ -395,9 +395,14 @@ const onSubmitNewStaff = (
 
 const getStaffListFromServer = async (setStaffListTableData) => {
   try {
-    const staffListData = await axios.get('http://localhost:5000/staff')
-    console.log("<<<STAFF LIST ", staffListData)
-    setStaffListTableData(staffListData)
+    const staffListParams = {
+      params: { 
+        id: 11
+      }
+    }
+    const staffListData = await axios.get('http://localhost:5000/staff', JSON.stringify(staffListParams))
+    const staffList = staffListData.data
+    setStaffListTableData(staffList)
   } catch(err) {
     console.log('error fetch staff data ', err)
   }

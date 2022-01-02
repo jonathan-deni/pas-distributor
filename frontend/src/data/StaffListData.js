@@ -57,7 +57,7 @@ export const staffColumns = [
       },
       {
         Header: "Tanggal Lahir",
-        accessor: "tanggal_lahir",
+        accessor: "tanggallahir",
       },
       {
         Header: "Agama",
@@ -65,15 +65,15 @@ export const staffColumns = [
       },
       {
         Header: "Mulai Kerja",
-        accessor: "mulai_kerja",
+        accessor: "mulaikerja",
       },
       {
         Header: "Tipe",
-        accessor: "tipe",
+        accessor: "stafftypeid",
       },
       {
         Header: "Gaji Pokok",
-        accessor: "gaji_pokok",
+        accessor: "gajipokok",
       },
       {
         Header: "Insentif",
@@ -93,7 +93,7 @@ export const staffColumns = [
       },
       {
         Header: "Sales Coor",
-        accessor: "sales_coor",
+        accessor: "coorid",
       },
       {
         Header: "Sales Supervisor",
