@@ -1,4 +1,6 @@
 import * as React from "react";
+import { useForm } from "react-hook-form";
+import { useTable } from "react-table";
 
 import {
   Button,
@@ -21,14 +23,13 @@ import {
   Row,
   Table,
 } from "reactstrap";
-import { useTable } from "react-table";
 import {
-  mockStaffTableData,
   staffColumns,
   staffDropdownList,
 } from "../../data/StaffListData";
-import { useForm } from "react-hook-form";
-const axios = require('axios');
+import Constants from "../../constants/Constants";
+
+const axios = require("axios");
 
 const CardHeaderWithButton = ({ onClickHeaderButton }) => (
   <div className="card-header-container">
@@ -54,20 +55,51 @@ const renderNormalCell = (cell) => (
 
 const renderIndexCell = (cell) => <th scope="row">{cell.render("Cell")}</th>;
 
-const renderActionButtonCell = (cell) => (
+const onClickDeleteButton = (id, setIsShowDeleteModal, setDeleteID) => () => {
+  setIsShowDeleteModal(true)
+  setDeleteID(id)
+}
+
+const onClickUpdateButton = (originalData, setDefaultStaffForm, setIsShowStaffModal) => () => {
+  setDefaultStaffForm(originalData)
+  setIsShowStaffModal(true)
+}
+
+const onClickDeleteModalButton = (id, setIsShowDeleteModal) => async () => {
+  try {
+    await axios.delete(
+      Constants.BASE_URL + "staff/" + id
+    );
+    setIsShowDeleteModal(false)
+  } catch (err) {
+    console.log("error delete staff data ", err);
+  }
+}
+
+const renderActionButtonCell = (cell, originalData, setIsShowDeleteModal, setDeleteID, setDefaultStaffForm, setIsShowStaffModal) => (
   <td {...cell.getCellProps()}>
     <Col>
       <Row sm={{ size: 1 }}>
-        <Button color="secondary">Update</Button>
+        <Button
+          onClick={onClickUpdateButton(originalData, setDefaultStaffForm, setIsShowStaffModal)}
+          color="secondary"
+          >
+          Update
+        </Button>
       </Row>
       <Row sm={{ size: 1 }}>
-        <Button color="secondary">Delete</Button>
+        <Button
+          onClick = {onClickDeleteButton(originalData.id, setIsShowDeleteModal, setDeleteID)}
+          color="secondary"
+        >
+          Delete
+        </Button>
       </Row>
     </Col>
   </td>
 );
 
-const StaffListTable = ({ columns, data }) => {
+const StaffListTable = ({ columns, data, setIsShowDeleteModal, setIsShowStaffModal, setDeleteID, setDefaultStaffForm }) => {
   const {
     getTableProps, // table props from react-table
     getTableBodyProps, // table body props from react-table
@@ -85,15 +117,12 @@ const StaffListTable = ({ columns, data }) => {
         <thead>
           {headerGroups.map((headerGroup) => (
             <tr {...headerGroup.getHeaderGroupProps()}>
-              {headerGroup.headers.map((column, i) => {
-                // if (i !== 0) {
-                return (
+              {headerGroup.headers.map((column, i) => (
                   <th {...column.getHeaderProps()}>
                     {column.render("Header")}
                   </th>
-                );
-                // }
-              })}
+                )
+              )}
             </tr>
           ))}
         </thead>
@@ -102,10 +131,17 @@ const StaffListTable = ({ columns, data }) => {
             prepareRow(row);
             return (
               <tr {...row.getRowProps()}>
-                {row.cells.map((cell, i) => {
+                {row.cells.map((cell, i, cellArr) => {
                   if (i === 0) return renderIndexCell(cell);
                   if (i === row.cells.length - 1)
-                    return renderActionButtonCell(cell);
+                    return renderActionButtonCell(
+                      cell,
+                      row.original,
+                      setIsShowDeleteModal,
+                      setDeleteID,
+                      setDefaultStaffForm,
+                      setIsShowStaffModal
+                    );
                   return renderNormalCell(cell);
                 })}
               </tr>
@@ -120,14 +156,15 @@ const StaffListTable = ({ columns, data }) => {
 const registerFormInput = (register, name, obj) => register(name, obj);
 
 const _renderDropdownOptions = (options) =>
-  options.map((opt, index) => index === 0 ? (
+  options.map((opt, index) =>
+    index === 0 ? (
       <option value="" disabled selected>
         {opt.option}
       </option>
     ) : (
       <option value={opt.value}>{opt.option}</option>
     )
-);
+  );
 
 const InputFormWithType = ({
   register,
@@ -156,12 +193,12 @@ const InputFormWithType = ({
           />
         )}
       </InputGroup>
-      <FormFeedback/>
+      <FormFeedback />
     </FormGroup>
   );
 };
 
-const NewStaffForm = ({ formMethods: { register } }) => {
+const NewStaffForm = ({ register }) => {
   const kodeRegister = registerFormInput(register, "kode", {
     isRequired: true,
   });
@@ -342,28 +379,81 @@ const NewStaffForm = ({ formMethods: { register } }) => {
   );
 };
 
-const AddNewStaffModal = ({ isShowAddModal, setIsShowAddModal, onSubmitNewStaff }) => {
-  const formMethods = useForm();
+const DeleteStaffConfirmModal = ({isShowDeleteModal, setIsShowDeleteModal, deleteID}) => (
+  <Modal
+      isOpen={isShowDeleteModal}
+      size={"l"}
+      scrollable={true}
+      backdrop={true}
+      fullscreen
+    >
+    <ModalHeader toggle={() => setIsShowDeleteModal(false)}>
+      Confirm Delete
+    </ModalHeader>
+    <ModalBody>
+      <div>
+        Are you sure you want to delete this data?
+      </div>
+    </ModalBody>
+    <ModalFooter>
+      <Button
+        onClick={onClickDeleteModalButton(deleteID, setIsShowDeleteModal)}
+      >
+        Delete
+      </Button>
+      <Button
+        color="danger"
+        onClick={() => setIsShowDeleteModal(false)}
+      >
+        Cancel
+      </Button>
+    </ModalFooter>
+  </Modal>
+)
+
+const onClickCloseStaffModal = (
+  setIsShowAddModal,
+  setDefaultStaffForm
+) => () => {
+  setIsShowAddModal(false)
+  setDefaultStaffForm({})
+}
+
+const StaffFormModal = ({
+  isShowAddModal,
+  setIsShowAddModal,
+  onSubmitNewStaff,
+  defaultStaffForm,
+  setDefaultStaffForm
+}) => {
+  const {register, handleSubmit, reset} = useForm({
+    defaultValues: defaultStaffForm
+  });
+
+  React.useEffect(() => {
+    reset(defaultStaffForm)
+  }, [defaultStaffForm]);
+
   return (
     <Modal
-      isOpen={isShowAddModal}
+      isOpen={isShowAddModal}a
       size={"xl"}
       scrollable={true}
       backdrop={true}
-      fullscreen={true}
+      fullscreen
     >
       <div className="add-staff-modal-container">
         <Form>
-          <ModalHeader toggle={() => setIsShowAddModal(false)}>
+          <ModalHeader toggle={onClickCloseStaffModal(setIsShowAddModal, setDefaultStaffForm)}>
             Add New Staff
           </ModalHeader>
           <ModalBody>
-            <NewStaffForm formMethods={formMethods} />
+            <NewStaffForm register={register} />
           </ModalBody>
           <ModalFooter>
             <Button
               onClick={() =>
-                formMethods.handleSubmit(data => onSubmitNewStaff(data))()
+                handleSubmit((data) => onSubmitNewStaff(data))()
               }
             >
               Save
@@ -375,64 +465,87 @@ const AddNewStaffModal = ({ isShowAddModal, setIsShowAddModal, onSubmitNewStaff 
   );
 };
 
-const onSubmitNewStaff = (
-  staffListTableData,
-  setStaffListTableData,
-  setIsShowAddModal
-) => (data) => {
+const onSubmitNewStaff = (setIsShowAddModal) => async (data) => {
   const newStaffData = {
     ...data,
-    sales_coor: "Itoy",
-    sales_supervisor: "Anthony"
-  }
-  const newStaffListTableData = [
-    ...staffListTableData,
-    newStaffData
-  ]
-  setStaffListTableData(newStaffListTableData)
-  setIsShowAddModal(false)
-}
+    sales_coor: null,
+    sales_supervisor: null,
+  };
+  await axios.post(Constants.BASE_URL + "staff", newStaffData, {
+    header: Constants.API_HEADER,
+  });
+  setIsShowAddModal(false);
+};
 
-const getStaffListFromServer = async (setStaffListTableData) => {
+const getStaffListFromServer = async (
+  setStaffListTableData
+) => {
   try {
-    const staffListParams = {
-      params: { 
-        id: 11
-      }
-    }
-    const staffListData = await axios.get('http://localhost:5000/staff', JSON.stringify(staffListParams))
-    const staffList = staffListData.data
-    setStaffListTableData(staffList)
-  } catch(err) {
-    console.log('error fetch staff data ', err)
+    const staffTypeData = await axios.get(
+      Constants.BASE_URL + "stafftype",
+      { header: Constants.API_HEADER }
+    );
+    const staffTypeList = staffTypeData.data;
+
+    const staffListData = await axios.get(
+      Constants.BASE_URL + "staff",
+      { header: Constants.API_HEADER }
+    );
+    const staffList = staffListData.data.map(
+      (item) =>
+        ({
+            ...item,
+            stafftypeid: staffTypeList.find(ele => item.stafftypeid === ele.id).nama
+        })
+    );
+    setStaffListTableData(staffList);
+  } catch (err) {
+    console.log("error fetch staff data ", err);
   }
-}
+};
 
 const ListDataStaff = () => {
   const columns = React.useMemo(() => staffColumns, []);
-  const [isShowAddModal, setIsShowAddModal] = React.useState(false);
+  const [isShowStaffModal, setIsShowStaffModal] = React.useState(false);
+  const [isShowDeleteModal, setIsShowDeleteModal] = React.useState(false);
+  const [deleteID, setDeleteID] = React.useState(0);
   const [staffListTableData, setStaffListTableData] = React.useState([]);
+  const [defaultStaffForm, setDefaultStaffForm] = React.useState({})
 
   React.useEffect(() => {
-    getStaffListFromServer(setStaffListTableData)
-  }, [])
+    getStaffListFromServer(setStaffListTableData);
+  }, [isShowStaffModal, isShowDeleteModal]);
 
   return (
     <div className="staff-container">
       <Card>
         <CardHeader>
           <CardHeaderWithButton
-            onClickHeaderButton={() => setIsShowAddModal(true)}
+            onClickHeaderButton={() => setIsShowStaffModal(true)}
           />
         </CardHeader>
         <CardBody>
-          <StaffListTable columns={columns} data={staffListTableData} />
+          <StaffListTable
+            columns={columns}
+            data={staffListTableData}
+            setIsShowDeleteModal={setIsShowDeleteModal}
+            setIsShowStaffModal={setIsShowStaffModal}
+            setDeleteID={setDeleteID}
+            setDefaultStaffForm={setDefaultStaffForm}
+          />
         </CardBody>
       </Card>
-      <AddNewStaffModal
-        isShowAddModal={isShowAddModal}
-        setIsShowAddModal={setIsShowAddModal}
-        onSubmitNewStaff={onSubmitNewStaff(staffListTableData, setStaffListTableData, setIsShowAddModal)}
+      <StaffFormModal
+        isShowAddModal={isShowStaffModal}
+        setIsShowAddModal={setIsShowStaffModal}
+        onSubmitNewStaff={onSubmitNewStaff(setIsShowStaffModal)}
+        defaultStaffForm={defaultStaffForm}
+        setDefaultStaffForm={setDefaultStaffForm}
+      />
+      <DeleteStaffConfirmModal
+        isShowDeleteModal={isShowDeleteModal}
+        setIsShowDeleteModal={setIsShowDeleteModal}
+        deleteID={deleteID}
       />
     </div>
   );

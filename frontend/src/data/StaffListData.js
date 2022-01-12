@@ -92,14 +92,6 @@ export const staffColumns = [
         accessor: "status",
       },
       {
-        Header: "Sales Coor",
-        accessor: "coorid",
-      },
-      {
-        Header: "Sales Supervisor",
-        accessor: "sales_supervisor",
-      },
-      {
         Header: "Action",
         accessor: "action",
       },
